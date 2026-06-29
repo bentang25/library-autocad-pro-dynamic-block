@@ -281,18 +281,22 @@
     </p>
     <div class="flex justify-center items-center gap-2 font-mono">
         <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
-            <span id="countdown-hours" class="text-xl font-extrabold text-[#FF6B00]">00</span>
-            <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Jam</span>
-        </div>
-        <span class="text-xl font-bold text-[#FF6B00] animate-pulse">:</span>
-        <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
-            <span id="countdown-minutes" class="text-xl font-extrabold text-[#FF6B00]">00</span>
+            <span id="countdown-minutes" class="text-xl font-extrabold text-[#FF6B00]">15</span>
             <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Menit</span>
         </div>
+        
         <span class="text-xl font-bold text-[#FF6B00] animate-pulse">:</span>
-        <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
-            <span id="countdown-seconds" class="text-xl font-extrabold text-[#FF6B00]">00</span>
+        
+        <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg p-2 min-w-[55px]">
+            <span id="countdown-seconds" class="text-xl font-extrabold text-[#1E293B]">00</span>
             <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Detik</span>
+        </div>
+        
+        <span class="text-xl font-bold text-slate-400">:</span>
+        
+        <div class="flex flex-col items-center bg-red-50 border border-red-100 rounded-lg p-2 min-w-[55px]">
+            <span id="countdown-ms" class="text-xl font-extrabold text-[#EF4444]">00</span>
+            <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Mili</span>
         </div>
     </div>
 </div>
@@ -315,12 +319,11 @@
         &copy; 2026 Library AutoCAD Pro. All Rights Reserved.
     </footer>
 
-    <script>
+<script>
     (function () {
-        // Durasi countdown diubah menjadi 15 menit (15 * 60 * 1000 milidetik)
+        // Durasi countdown: 15 menit dalam milidetik
         const countdownDuration = 15 * 60 * 1000; 
-        // Nama key diperbarui agar browser langsung menerapkan durasi baru tanpa bentrok data lama
-        const storageKey = 'autocad_pro_countdown_15m';
+        const storageKey = 'autocad_pro_countdown_ms';
 
         let targetTime = localStorage.getItem(storageKey);
 
@@ -329,7 +332,7 @@
             localStorage.setItem(storageKey, targetTime);
         } else {
             targetTime = parseInt(targetTime, 10);
-            // Jika waktu target sudah lewat di masa lalu, reset ulang untuk kunjungan baru
+            // Jika waktu target sudah lewat, reset ulang 15 menit untuk simulasi urgensi berkala
             if (new Date().getTime() > targetTime) {
                 targetTime = new Date().getTime() + countdownDuration;
                 localStorage.setItem(storageKey, targetTime);
@@ -341,25 +344,27 @@
             const difference = targetTime - now;
 
             if (difference <= 0) {
-                document.getElementById('countdown-hours').innerText = "00";
                 document.getElementById('countdown-minutes').innerText = "00";
                 document.getElementById('countdown-seconds').innerText = "00";
+                document.getElementById('countdown-ms').innerText = "00";
                 clearInterval(timerInterval);
                 return;
             }
 
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            // Hitung sisa waktu komponen Menit, Detik, dan Milidetik
             const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            // Ambil 2 angka depan dari milidetik agar muat di dalam boks (00-99)
+            const milliseconds = Math.floor((difference % 1000) / 10);
 
-            document.getElementById('countdown-hours').innerText = hours.toString().padStart(2, '0');
             document.getElementById('countdown-minutes').innerText = minutes.toString().padStart(2, '0');
             document.getElementById('countdown-seconds').innerText = seconds.toString().padStart(2, '0');
+            document.getElementById('countdown-ms').innerText = milliseconds.toString().padStart(2, '0');
         }
 
-        // Jalankan fungsi sekali di awal, lalu set interval per 1 detik
+        // Jalankan fungsi secara berkala setiap 10 milidetik agar pergerakan angka mili menjadi presisi
         updateCountdown();
-        const timerInterval = setInterval(updateCountdown, 1000);
+        const timerInterval = setInterval(updateCountdown, 10);
     })();
 </script>
     
