@@ -274,7 +274,28 @@
                     Rp <span class="text-[#FF6B00]">97.000</span>
                 </p>
             </div>
-
+            
+<div class="mt-4 mb-6 text-center">
+    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+        ⚠️ Penawaran Berakhir Dalam:
+    </p>
+    <div class="flex justify-center items-center gap-2 font-mono">
+        <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
+            <span id="countdown-hours" class="text-xl font-extrabold text-[#FF6B00]">00</span>
+            <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Jam</span>
+        </div>
+        <span class="text-xl font-bold text-[#FF6B00] animate-pulse">:</span>
+        <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
+            <span id="countdown-minutes" class="text-xl font-extrabold text-[#FF6B00]">00</span>
+            <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Menit</span>
+        </div>
+        <span class="text-xl font-bold text-[#FF6B00] animate-pulse">:</span>
+        <div class="flex flex-col items-center bg-orange-50 border border-orange-200 rounded-lg p-2 min-w-[55px]">
+            <span id="countdown-seconds" class="text-xl font-extrabold text-[#FF6B00]">00</span>
+            <span class="text-[9px] uppercase tracking-wide text-slate-500 font-sans mt-0.5">Detik</span>
+        </div>
+    </div>
+</div>
             <div class="mt-6 pt-4 border-t border-slate-100 text-slate-500 text-sm space-y-1 font-medium">
                 <p>✔ Sekali bayar. Akses selamanya.</p>
                 <p>✔ Gunakan untuk tugas, proyek freelance, maupun pekerjaan profesional.</p>
@@ -294,5 +315,53 @@
         &copy; 2026 Library AutoCAD Pro. All Rights Reserved.
     </footer>
 
+    <script>
+    (function () {
+        // Durasi countdown diubah menjadi 15 menit (15 * 60 * 1000 milidetik)
+        const countdownDuration = 15 * 60 * 1000; 
+        // Nama key diperbarui agar browser langsung menerapkan durasi baru tanpa bentrok data lama
+        const storageKey = 'autocad_pro_countdown_15m';
+
+        let targetTime = localStorage.getItem(storageKey);
+
+        if (!targetTime) {
+            targetTime = new Date().getTime() + countdownDuration;
+            localStorage.setItem(storageKey, targetTime);
+        } else {
+            targetTime = parseInt(targetTime, 10);
+            // Jika waktu target sudah lewat di masa lalu, reset ulang untuk kunjungan baru
+            if (new Date().getTime() > targetTime) {
+                targetTime = new Date().getTime() + countdownDuration;
+                localStorage.setItem(storageKey, targetTime);
+            }
+        }
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetTime - now;
+
+            if (difference <= 0) {
+                document.getElementById('countdown-hours').innerText = "00";
+                document.getElementById('countdown-minutes').innerText = "00";
+                document.getElementById('countdown-seconds').innerText = "00";
+                clearInterval(timerInterval);
+                return;
+            }
+
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown-hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('countdown-minutes').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('countdown-seconds').innerText = seconds.toString().padStart(2, '0');
+        }
+
+        // Jalankan fungsi sekali di awal, lalu set interval per 1 detik
+        updateCountdown();
+        const timerInterval = setInterval(updateCountdown, 1000);
+    })();
+</script>
+    
 </body>
 </html>
